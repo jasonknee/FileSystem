@@ -42,6 +42,12 @@ class PackableMemory {
         return v;
     }
 
+    void packString(String str, int loc) {
+        for (byte i: str.getBytes()) {
+            mem[loc++] = i;
+        }
+    }
+
     // Test the above pack and unpack methods by iterating the following
     //  over all possible 4-byte integers: pack the integer,
     //  then unpack it, and then verify that the unpacked integer equals the

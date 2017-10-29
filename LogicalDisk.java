@@ -24,6 +24,10 @@ public class LogicalDisk {
         }
     }
 
+    int getIntOfBlockWithIndex(int blockNum, int index) {
+        return disk.unpack(blockNum * index) ;
+    }
+
     void init(byte[] block) {
         disk.mem = block;
     }

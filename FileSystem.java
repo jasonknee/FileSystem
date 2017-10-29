@@ -24,6 +24,7 @@ public class FileSystem {
         System.out.printf("=> void create(char[] filename = %s);\n", filename);
 
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
+        System.out.printf("FileDescriptorIndex = %d", fileDescriptorBlockIndex);        
         if (fileDescriptorBlockIndex == -1) { // IF WE DON'T FIND A FILE
 
             fileDescriptorBlockIndex = directory.getFreeBlock();
