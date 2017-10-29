@@ -94,29 +94,47 @@ public class FileSystem {
         if (fileTableEntry == null) {
             return -1;
         }
+
         directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
         fileTable.freeEntry(fileTableEntry.fileTableIndex);
         return 0;
 
     }
 
-    void read(String index, String mem_area, String count) {
+
+    // 1. Compute the position within the read/write buffer that corresponds to the current
+    // position within the file (i.e., file length modulo buffer length)
+    // 2. Start copying bytes from the buffer into the specified main memory location until
+    // one of the following happens:
+    //      (a) the desired count or the end of the file is reached; in this case, update current
+    //          position and return status
+    //      (b) the end of the buffer is reached; in this case,
+    //              • write the buffer into the appropriate block on disk (if modified),
+    //              • read the next sequential block from the disk into the buffer;
+    //              • continue with step 2.
+    int read(int fileTableIndex, int count) {
+        byte[] data;
+
+        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+
+        if (fileTableEntry == null) {
+            return -1;
+        }
+
+        byte[] file = fileTableEntry.readFile(fileTableIndex, count);
+
+        return 0;
     }
 
-    void write(String index, String mem_area, String count) {
-    }
+    void write(String index, String mem_area, String count) {}
 
-    void lseek(String index, String pos) {
-    }
+    void lseek(String index, String pos) {}
 
-    void directory() {
-    }
+    void directory() {}
 
-    void init(String file_name) {
-    }
+    void init(String file_name) {}
 
-    void save(String file_name) {
-    }
+    void save(String file_name) {}
 
     public static void main(String[] args) {
         FileSystem fs = new FileSystem();
