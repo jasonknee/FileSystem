@@ -7,6 +7,8 @@ public class FileStream {
     public FileStream() {}
 
     static byte[] getFileAsByteArray(String filename){
+        System.out.printf("=> byte[] FileStream.getFileAsByteArray(string filename = %s);\n", filename);
+        
         byte[] fileDisk = new byte[DISK_SIZE];
         
         try {
@@ -27,17 +29,13 @@ public class FileStream {
         return fileDisk;
     }
 
-    static int write(String filename, byte[] disk) {
-        return 0;
-    }
-
-    static boolean fileExists(String filename) {
-        return true;
-    }
+    static int write(String filename, byte[] disk) { return 0; }
+    static boolean fileExists(String filename) { return true; }
     static void createFile(String filename){}
-
+    
     public static void main(String[] args) {
-        FileStream fs = new FileStream();
-        fs.getFileAsByteArray("test.txt");
+        // FileStream fs = new FileStream();
+        String filename = "test.txt";
+        FileStream.getFileAsByteArray(filename);
     }    
 }

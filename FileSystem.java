@@ -21,10 +21,9 @@ public class FileSystem {
     // • Enter the symbolic file name and the descriptor index into the found directory entry
     // • Return status
     int create(String filename) {
-        System.out.printf("void create(%s);\n", filename);
-        int fileDescriptorBlockIndex;
+        System.out.printf("=> void create(char[] filename = %s);\n", filename);
 
-        fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
+        int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) { // IF WE DON'T FIND A FILE
 
             fileDescriptorBlockIndex = directory.getFreeBlock();
@@ -45,7 +44,7 @@ public class FileSystem {
     // • Free the file descriptor
     // • Return status
     int destroy(String filename) {
-        System.out.printf("void destroy(%s);\n", filename);
+        System.out.printf("=> void destroy(char[] filename = %s);\n", filename);
 
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) {
@@ -64,7 +63,7 @@ public class FileSystem {
     // • Read the first block of the file into the buffer (read-ahead)
     // • Return the OFT index (or error status)
     int open(String filename) {
-        System.out.printf("void open(%s);\n", filename);
+        System.out.printf("=> void open(char[] filename = %s);\n", filename);
 
         if (!fileTable.isFree()) {
             return -1; // NO OPEN FILE TABLES
@@ -88,6 +87,8 @@ public class FileSystem {
     // • Free the OFT entry
     // • Return status
     int close(int fileTableIndex) {
+        System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);                
+        
         FileTableEntry fileTableEntry = fileTable.writeToDisk(fileTableIndex);
 
         if (fileTableEntry == null) { return -1; }
@@ -110,6 +111,8 @@ public class FileSystem {
     //              • read the next sequential block from the disk into the buffer;
     //              • continue with step 2.
     byte[] read(int fileTableIndex, int count) {
+        System.out.printf("=> int read(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
+
         FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
 
         if (fileTableEntry == null) { System.exit(0); }
@@ -130,6 +133,8 @@ public class FileSystem {
     //          • JUMP TO (LOOP)
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
+        System.out.printf("=> int write(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
+        
         FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         if (fileTableEntry == null) { return -1; }
 
@@ -138,6 +143,8 @@ public class FileSystem {
     }
 
     int lseek(int fileTableIndex, int position) {
+        System.out.printf("=> int lseek(int fileTableIndex = %s, int position, %d);\n", fileTableIndex, position);                
+        
         FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         if (fileTableEntry == null) { return -1; }
 
@@ -146,12 +153,15 @@ public class FileSystem {
     }
 
     String[] directory() {
+        System.out.printf("=> String[] directory();\n");                
         String[] arrayOfFileNames;
         arrayOfFileNames = directory.arrayOfFileNames();
         return arrayOfFileNames;
     }
 
     String init(String filename) {
+        System.out.printf("=> void int(String filename = %s);\n", filename);        
+        
         if (FileStream.fileExists(filename)) {
             byte[] fileBlock = FileStream.getFileAsByteArray(filename);
             logicalDisk.init(fileBlock);
@@ -163,6 +173,7 @@ public class FileSystem {
     }
 
     String save(String filename) {
+        System.out.printf("=> void save(String filename = %s);\n", filename);        
         try {
             byte[] disk = logicalDisk.fullDiskAsByteArray();
             FileStream.write(filename, disk);
@@ -175,6 +186,7 @@ public class FileSystem {
 
     public static void main(String[] args) {
         FileSystem fs = new FileSystem();
-        fs.create("hey");
+        String filename = "char";
+        fs.create(filename);
     }
 }

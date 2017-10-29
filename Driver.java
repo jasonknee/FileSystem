@@ -24,16 +24,19 @@ public class Driver
         try {
             if (cmd.equals("cr")) {
                     example_cmd = "cr <name>";
-
-                    fs.create(args[0]);
+                    String filename = args[0];
+                
+                    fs.create(filename);
             } else if (cmd.equals("de")) {
-                    example_cmd = "de <name>";      
-
-                    fs.destroy(args[0]);
+                    example_cmd = "de <name>";
+                    String filename = args[0];
+                    
+                    fs.destroy(filename);
             } else if (cmd.equals("op")) {
                     example_cmd = "op <name>";                
-                
-                    fs.open(args[0]);
+                    String filename = args[0];
+                    
+                    fs.open(filename);
             } else if (cmd.equals("cl")) {
                     example_cmd = "cl <index>";
                     int index = Integer.valueOf(args[0]); 
@@ -64,12 +67,15 @@ public class Driver
                     fs.directory();
             } else if (cmd.equals("in")) {
                     example_cmd = "in <disk_cont.txt>";  
-
-                    fs.init(args[0]);
+                    String filename = args[0];
+                    
+                    fs.init(filename);
             } else if (cmd.equals("sv")) {
                     example_cmd = "sv <disk_cont.txt>";       
+                    String filename = args[0];
+                    
 
-                    fs.save(args[0]);
+                    fs.save(filename);
             } else {
                     System.out.println("/*************************************/\n"
                     + "       ERROR: NO COMMAND ENTERED \n"
