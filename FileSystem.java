@@ -91,9 +91,7 @@ public class FileSystem {
     int close(String fileTableIndex) {
         FileTableEntry fileTableEntry = filetable.writeToDisk(fileTableIndex);
 
-        if (fileTableEntry == null) {
-            return -1;
-        }
+        if (fileTableEntry == null) { return -1; }
 
         directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
         fileTable.freeEntry(fileTableEntry.fileTableIndex);
@@ -112,29 +110,67 @@ public class FileSystem {
     //              • write the buffer into the appropriate block on disk (if modified),
     //              • read the next sequential block from the disk into the buffer;
     //              • continue with step 2.
-    int read(int fileTableIndex, int count) {
-        byte[] data;
-
+    byte[] read(int fileTableIndex, int count) {
         FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
 
-        if (fileTableEntry == null) {
-            return -1;
-        }
+        if (fileTableEntry == null) { return -1; }
 
-        byte[] file = fileTableEntry.readFile(fileTableIndex, count);
+        byte[] bytesRead = fileTableEntry.readFile(count);
+        return bytesRead;
+    }
 
+    // • compute position in the r/w buffer
+    // • copy from memory into buffer until (LOOP)
+    //      • desired count or end of file is reached:
+    //              update current pos, return status
+    //      • end of buffer is reached
+    //          • if block doesn't exist yet (file is expanding)
+    //                      - allocate new block (search and update bitmap)
+    //                      - update file descriptor with new block number
+    //          • write the buffer to disk block
+    //          • JUMP TO (LOOP)
+    //  • update file length in descriptor
+    int write(int fileTableIndex, char character, int count) {
+        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+        if (fileTableEntry == null) { return -1; }
+
+        int bytesWritten = fileTableEntry.writeFile(character, count);
+        return bytesWritten;
+    }
+
+    int lseek(int fileTableIndex, String position) {
+        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+        if (fileTableEntry == null) { return -1; }
+
+        fileTablesEntry.moveToPosition(position);
         return 0;
     }
 
-    void write(String index, String mem_area, String count) {}
+    String[] directory() {
+        String[] arrayOfFileNames;
+        arrayOfFileNames = directory.allFiles();
+        return arrayOfFileNames;
+    }
 
-    void lseek(String index, String pos) {}
+    String init(String filename) {
+        if (FileSystem.fileDoesNotExists(filename)) {
+            FileSystem.createFile(file);
+            return "disk initalized";
+        }
 
-    void directory() {}
+        return "disk restored";
+    }
 
-    void init(String file_name) {}
-
-    void save(String file_name) {}
+    int save(String file_name) {
+        try {
+            byte[] disk = logicalDisk.fullDiskAsByteArray();
+            Files.write(filename, disk);
+        }
+        catch (Exception e) {
+            System.out.println("ERROR");
+        }
+       
+    }
 
     public static void main(String[] args) {
         FileSystem fs = new FileSystem();
