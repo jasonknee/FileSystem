@@ -12,4 +12,8 @@ public class FileTableEntry {
         fileDescriptorIndex = i;
         fileTableIndex = ftI;
     }
+
+    public void moveToPosition(int position) {}
+    public byte[] readFile(int count) { return new byte[64]; };   
+    public int writeFile(char c, int count) { return 0; }
 }

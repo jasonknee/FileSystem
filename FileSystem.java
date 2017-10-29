@@ -1,7 +1,7 @@
 public class FileSystem {
     private final int BLOCK_SIZE = 64;
 
-    public LogicalDisk logicaldisk;
+    public LogicalDisk logicalDisk;
     public BitMap bitMap;
     public Directory directory;
     public FileTable fileTable;
@@ -9,9 +9,8 @@ public class FileSystem {
     public FileSystem() {
         logicalDisk = new LogicalDisk(BLOCK_SIZE);
         bitMap = new BitMap(logicalDisk);
-        directory = new Directory(logicaldisk);
+        directory = new Directory(logicalDisk);
         fileTable = new FileTable(directory);
-
     }
 
     // • Find a free file descriptor (read in and scan ldisk [0] through ldisk [k − 1])
@@ -32,7 +31,7 @@ public class FileSystem {
             if (fileDescriptorBlockIndex != -1) { // IF WE GET A FREE FILE DESCRIPTOR BLOCK
 
                 fileDescriptorBlockIndex = directory.createNewFile(filename, fileDescriptorBlockIndex);
-                filetable.insert(filename, fileDescriptorBlockIndex);
+                fileTable.insert(filename, fileDescriptorBlockIndex);
                 return 0;
             }
         }
@@ -54,7 +53,7 @@ public class FileSystem {
         }
 
         directory.trashFile(filename);
-        bitMap.freeBlockIndex(blockIndex);
+        bitMap.freeBlockIndex(fileDescriptorBlockIndex);
         return 0;
 
     }
@@ -67,7 +66,7 @@ public class FileSystem {
     int open(String filename) {
         System.out.printf("void open(%s);\n", filename);
 
-        if (!filetable.isFree()) {
+        if (!fileTable.isFree()) {
             return -1; // NO OPEN FILE TABLES
         }
 
@@ -77,7 +76,7 @@ public class FileSystem {
         }
 
         int fileLength = directory.getLengthOfFile(fileDescriptorBlockIndex);
-        int blockIndex = directory.getBlockIndexOfFile(fileDescriptorIndex, 0);
+        int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0);
         byte[] blockData = logicalDisk.readBlock(blockIndex);
         FileTableEntry fileTableEntry = fileTable.allocateEntry(blockData, fileDescriptorBlockIndex, fileLength, 0);
 
@@ -88,8 +87,8 @@ public class FileSystem {
     // • Update file length in descriptor
     // • Free the OFT entry
     // • Return status
-    int close(String fileTableIndex) {
-        FileTableEntry fileTableEntry = filetable.writeToDisk(fileTableIndex);
+    int close(int fileTableIndex) {
+        FileTableEntry fileTableEntry = fileTable.writeToDisk(fileTableIndex);
 
         if (fileTableEntry == null) { return -1; }
 
@@ -111,9 +110,9 @@ public class FileSystem {
     //              • read the next sequential block from the disk into the buffer;
     //              • continue with step 2.
     byte[] read(int fileTableIndex, int count) {
-        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
 
-        if (fileTableEntry == null) { return -1; }
+        if (fileTableEntry == null) { System.exit(0); }
 
         byte[] bytesRead = fileTableEntry.readFile(count);
         return bytesRead;
@@ -131,45 +130,47 @@ public class FileSystem {
     //          • JUMP TO (LOOP)
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
-        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         if (fileTableEntry == null) { return -1; }
 
         int bytesWritten = fileTableEntry.writeFile(character, count);
         return bytesWritten;
     }
 
-    int lseek(int fileTableIndex, String position) {
-        FileTableEntry fileTableEntry = filetable.getFileTableEntry(fileTableIndex);
+    int lseek(int fileTableIndex, int position) {
+        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         if (fileTableEntry == null) { return -1; }
 
-        fileTablesEntry.moveToPosition(position);
+        fileTableEntry.moveToPosition(position);
         return 0;
     }
 
     String[] directory() {
         String[] arrayOfFileNames;
-        arrayOfFileNames = directory.allFiles();
+        arrayOfFileNames = directory.arrayOfFileNames();
         return arrayOfFileNames;
     }
 
     String init(String filename) {
-        if (FileSystem.fileDoesNotExists(filename)) {
-            FileSystem.createFile(file);
-            return "disk initalized";
+        if (FileStream.fileExists(filename)) {
+            byte[] fileBlock = FileStream.getFileAsByteArray(filename);
+            logicalDisk.init(fileBlock);
+            return "disk restored";
         }
 
-        return "disk restored";
+        FileStream.createFile(filename);
+        return "disk initialized";
     }
 
-    int save(String file_name) {
+    String save(String filename) {
         try {
             byte[] disk = logicalDisk.fullDiskAsByteArray();
-            Files.write(filename, disk);
+            FileStream.write(filename, disk);
+            return "disk saved";
         }
         catch (Exception e) {
-            System.out.println("ERROR");
+            return "error";
         }
-       
     }
 
     public static void main(String[] args) {

@@ -4,6 +4,8 @@ public class BitMap {
 
     public BitMap(LogicalDisk disk) {
         logicaldisk = disk;
-        bitmap = disk.size;
+        bitmap = new byte[64];
     }
+
+    public void freeBlockIndex(int blockIndex) {}
 }

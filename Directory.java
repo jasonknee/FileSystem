@@ -1,5 +1,5 @@
 public class Directory {
-    public LogicalDisk logicaldisk;
+    public LogicalDisk logicalDisk;
 
     /* Directory entries */
     /* every pair store file descriptor index and file name. */
@@ -8,6 +8,19 @@ public class Directory {
     private int dir_entries[];
 
     public Directory(LogicalDisk disk) {
-        logicaldisk = disk;
+        logicalDisk = disk;
     }
+
+    String[] arrayOfFileNames() {
+        String[] array = new String[46];
+        return array;
+    }
+
+    public int getFreeBlock() { return 0; }
+    public int createNewFile(String filename, int index) { return 0;}
+    public int getBlockIndexOfFile(int index, int blockNum) { return 0; }
+    public int getLengthOfFile(int index) { return 0; }
+    public int findFileDescriptorIndexOfFile(String filename) { return 0;}    
+    public void trashFile(String filename) {}    
+    public void updateLengthOfFileDescriptor(int index) {}
 }

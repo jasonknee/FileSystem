@@ -1,22 +1,40 @@
 import java.util.Scanner;
+import java.io.File;
 
 public class FileStream {
-    private final int DISK_SIZE = 64*64;
-
+    static final int DISK_SIZE = 64*64;
 
     public FileStream() {}
 
-    byte[] getFileAsByteArray(String filename){
-        Scanner scanner = new Scanner(new File(filename));
-        byte[] fileDisk = new fileDisk[DISK_SIZE];
-        int i = 0;
-        while (scanner.hasNextByte()) {
-            fileDisk[i] = scanner.nextByte();
-            i++;
+    static byte[] getFileAsByteArray(String filename){
+        byte[] fileDisk = new byte[DISK_SIZE];
+        
+        try {
+            Scanner scanner = new Scanner(new File(filename));
+            int i = 0;
+            while (scanner.hasNextByte()) {
+                fileDisk[i] = scanner.nextByte();
+                i++;
+            }
+            scanner.close();
+            return fileDisk;
         }
-        scanner.close();
+        catch (Exception e) {
+            System.out.println("error");
+            System.exit(0);
+        }
+        
         return fileDisk;
     }
+
+    static int write(String filename, byte[] disk) {
+        return 0;
+    }
+
+    static boolean fileExists(String filename) {
+        return true;
+    }
+    static void createFile(String filename){}
 
     public static void main(String[] args) {
         FileStream fs = new FileStream();

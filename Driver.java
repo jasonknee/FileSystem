@@ -23,40 +23,58 @@ public class Driver
         
         try {
             if (cmd.equals("cr")) {
-                example_cmd = "cr <name>";
-                fs.create(args[0]);
+                    example_cmd = "cr <name>";
+
+                    fs.create(args[0]);
             } else if (cmd.equals("de")) {
-                example_cmd = "de <name>";                
-                fs.destroy(args[0]);
+                    example_cmd = "de <name>";      
+
+                    fs.destroy(args[0]);
             } else if (cmd.equals("op")) {
-                example_cmd = "op <name>";                
-                fs.open(args[0]);
+                    example_cmd = "op <name>";                
+                
+                    fs.open(args[0]);
             } else if (cmd.equals("cl")) {
-                example_cmd = "cl <index>";
-                fs.close(args[0]);
+                    example_cmd = "cl <index>";
+                    int index = Integer.valueOf(args[0]); 
+
+                    fs.close(index);
             } else if (cmd.equals("rd")) {
-                example_cmd = "rd <index> <count>";
-                fs.read(args[0], args[1], args[2]);
+                    example_cmd = "rd <index> <count>";
+                    int index = Integer.valueOf(args[0]);    
+                    int count = Integer.valueOf(args[1]);
+
+                    fs.read(index, count);
             } else if (cmd.equals("wr")) {
-                example_cmd = "wr <index> <char> <count>";                
-                fs.write(args[0], args[1], args[2]);
+                    example_cmd = "wr <index> <char> <count>";      
+                    int index = Integer.valueOf(args[0]);
+                    char c = args[1].charAt(0);
+                    int count = Integer.valueOf(args[2]);
+
+                    fs.write(index, c, count);
             } else if (cmd.equals("sk")) {
-                example_cmd = "sk <index> <pos>";                
-                fs.lseek(args[0], args[1]);
+                    example_cmd = "sk <index> <pos>";     
+                    int index = Integer.valueOf(args[0]);
+                    int pos = Integer.valueOf(args[1]);
+                    
+                    fs.lseek(index, pos);
             } else if (cmd.equals("dr")) {
-                example_cmd = "dr";                
-                fs.directory();
+                    example_cmd = "dr";     
+
+                    fs.directory();
             } else if (cmd.equals("in")) {
-                example_cmd = "in <disk_cont.txt>";                
-                fs.init(args[0]);
+                    example_cmd = "in <disk_cont.txt>";  
+
+                    fs.init(args[0]);
             } else if (cmd.equals("sv")) {
-                example_cmd = "sv <disk_cont.txt>";                                
-                fs.save(args[0]);
+                    example_cmd = "sv <disk_cont.txt>";       
+
+                    fs.save(args[0]);
             } else {
-                System.out.println("/*************************************/\n"
-                + "       ERROR: NO COMMAND ENTERED \n"
-                + "       EXAMPLE CMD: init\n" 
-                + "/*************************************/\n");
+                    System.out.println("/*************************************/\n"
+                    + "       ERROR: NO COMMAND ENTERED \n"
+                    + "       EXAMPLE CMD: init\n" 
+                    + "/*************************************/\n");
             }
         } catch (Exception e) {
             System.out.println(e);

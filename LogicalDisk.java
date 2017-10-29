@@ -24,7 +24,15 @@ public class LogicalDisk {
         }
     }
 
+    void init(byte[] block) {
+        disk.mem = block;
+    }
+
     byte[] getDisk() {
+        return disk.mem;
+    }
+
+    byte[] fullDiskAsByteArray() {
         return disk.mem;
     }
 
