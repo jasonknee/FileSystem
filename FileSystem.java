@@ -62,20 +62,27 @@ public class FileSystem {
         System.out.printf("=> void open(char[] filename = %s);\n", filename);
 
         if (!fileTable.isFree()) {
+            System.out.println("ERROR: no more entries available in oft");            
             return -1; // NO OPEN FILE TABLES
         }
 
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) {
+            System.out.println("ERROR: file does not exist");                        
             return -1; // DID NOT FIND FILE
         }
 
         int fileLength = directory.getLengthOfFile(fileDescriptorBlockIndex);
-        int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0);
+        int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0); // GET BLOCK INDEX
         byte[] blockData = logicalDisk.readBlock(blockIndex);
-        FileTableEntry fileTableEntry = fileTable.allocateEntry(blockData, fileDescriptorBlockIndex, fileLength, 0);
 
-        return fileTableEntry.fileTableIndex;
+        int openFileTableIndex = fileTable.allocateEntry(blockData, fileLength, 0, fileDescriptorBlockIndex);
+        if (openFileTableIndex != -1) {
+            System.out.printf("%s opened %d\n", filename, openFileTableIndex);                        
+            return openFileTableIndex;
+        }
+
+        return -1;
     }
 
     // • Write the buffer to disk
