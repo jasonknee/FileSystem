@@ -80,14 +80,14 @@ public class FileSystem {
         int fileLength = directory.getLengthOfFile(fileDescriptorBlockIndex);
         int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0); // GET BLOCK INDEX
         byte[] blockData = logicalDisk.readBlock(blockIndex);
-
         int openFileTableIndex = fileTable.allocateEntry(blockData, filename, fileLength, 0, fileDescriptorBlockIndex);
-        if (openFileTableIndex != -1) {
-            System.out.printf("%s opened %d\n", filename, openFileTableIndex);                        
-            return openFileTableIndex;
+
+        if (openFileTableIndex == -1) {
+            return -1;            
         }
 
-        return -1;
+        System.out.printf("%s opened %d\n", filename, openFileTableIndex);                        
+        return openFileTableIndex;
     }
 
     // • Write the buffer to disk
@@ -95,9 +95,10 @@ public class FileSystem {
     // • Free the OFT entry
     // • Return status
     int close(int fileTableIndex) {
-        System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);                
-        
-        FileTableEntry fileTableEntry = fileTable.writeToDisk(fileTableIndex);
+        System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);        
+
+        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
+        fileTable.writeToDisk(fileTableIndex);
 
         if (fileTableEntry == null) { return -1; }
 

@@ -64,8 +64,8 @@ public class FileTable {
     }
 
     public int getBlockIndexOfFile(int index, int fdBlockIndex) {
-        System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = $d);\n", index, fdBlockIndex);        
-        return logicalDisk.disk.unpack(index+4 * (4*fdBlockIndex));
+        System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);        
+        return logicalDisk.disk.unpack(index+4 + (4*fdBlockIndex));
     }
 
     public int allocateEntry(byte[] data, String filename, int length, int position, int index) {
@@ -82,8 +82,13 @@ public class FileTable {
         return fileTable[index];
     }
 
-    public FileTableEntry writeToDisk(int index) {
-        return new FileTableEntry(null, "", -1, -1, -1, -1);
+    public int writeToDisk(int index) {
+        FileTableEntry fileToDelete = getFileTableEntry(index);
+        int fdBlockIndex = fileTable[index].getBufferBlockNum();        
+        int blockIndex = getBlockIndexOfFile(fileToDelete.fileDescriptorIndex, fdBlockIndex);
+        logicalDisk.writeBlock(blockIndex, fileToDelete.bufferData);
+        fileToDelete.dealloc(index);
+        return 0;
     }
 
     public int findFileDescriptorIndexOfFile(int index) {

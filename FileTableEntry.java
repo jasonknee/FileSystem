@@ -37,12 +37,41 @@ public class FileTableEntry {
         available = true;
     }
 
+    public void dealloc(int index) {
+        bufferData = null;
+        fileName = "";
+        fileLength = -1;
+        positionInFile = 0;
+        fileDescriptorIndex = -1;
+        fileTableIndex = index;
+        available = true;
+    }
+
     public boolean isAvailable() {
         return available;
     }
 
     public String getFileName() {
         return fileName;
+    }
+
+    public byte[] getBufferBlock() {
+        return bufferData;
+    }
+
+    public int getBufferBlockNum() {
+        if (0 <= positionInFile && positionInFile < 64) {
+            return 0;
+        }
+        if (64 <= positionInFile && positionInFile < 128) {
+            return 1;
+        }
+        if (128 <= positionInFile && positionInFile < 192) {
+            return 2;
+        }
+        else {
+            return -1;
+        }
     }
 
     public void moveToPosition(int position) {}
