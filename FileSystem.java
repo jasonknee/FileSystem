@@ -10,7 +10,10 @@ public class FileSystem {
         logicalDisk = new LogicalDisk(BLOCK_SIZE);
         bitMap = new BitMap(logicalDisk);
         directory = new Directory(logicalDisk);
-        fileTable = new FileTable(directory);
+        fileTable = new FileTable(logicalDisk);
+        fileTable.alloc();
+        
+        logicalDisk.printDisk();                                    
     }
 
     // • Find a free file descriptor (read in and scan ldisk [0] through ldisk [k − 1])
@@ -23,16 +26,17 @@ public class FileSystem {
     int create(String filename) {
         System.out.printf("=> void create(char[] filename = %s);\n", filename);
 
-        int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
-        System.out.printf("FileDescriptorIndex = %d", fileDescriptorBlockIndex);        
-        if (fileDescriptorBlockIndex == -1) { // IF WE DON'T FIND A FILE
+        int fileDescriptorIndex = directory.findFileDescriptorIndexOfFile(filename);
+        System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
+        if (fileDescriptorIndex == -1) { // IF WE DON'T FIND A FILE
 
-            fileDescriptorBlockIndex = directory.getFreeBlock();
-            if (fileDescriptorBlockIndex != -1) { // IF WE GET A FREE FILE DESCRIPTOR BLOCK
+            fileDescriptorIndex = directory.getFreeFileDescriptorIndex();
+            System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
+            if (fileDescriptorIndex != -1) { // IF WE GET A FREE FILE DESCRIPTOR BLOCK
 
-                fileDescriptorBlockIndex = directory.createNewFile(filename, fileDescriptorBlockIndex);
-                fileTable.insert(filename, fileDescriptorBlockIndex);
-                return 0;
+                if (directory.createNewFile(filename, fileDescriptorIndex) == 0) {
+                    return 0;
+                }
             }
         }
 
