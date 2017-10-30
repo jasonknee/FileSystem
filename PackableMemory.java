@@ -48,6 +48,14 @@ class PackableMemory {
         }
     }
 
+    String unpackString(int loc) {
+        byte[] fname = new byte[3];
+        fname[0] = mem[loc];
+        fname[1] = mem[loc+1];
+        fname[2] = mem[loc+2];
+        return new String(fname);
+    }
+
     // Test the above pack and unpack methods by iterating the following
     //  over all possible 4-byte integers: pack the integer,
     //  then unpack it, and then verify that the unpacked integer equals the

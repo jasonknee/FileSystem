@@ -30,13 +30,11 @@ public class Directory {
 
         for (int i = 0; i < directoryBlockPointers.length; i++) {
             if (directoryBlockPointers[i] != 0) {
-                byte[] block = logicalDisk.readBlock(directoryBlockPointers[i]);
-
-                for (int j = 0; j < block.length; j = j + 8) {
-                    byte[] directoryEntryFileName = Arrays.copyOfRange(block, j, j + 4); // ONE FILE DIRECTORY ENTRY
-
-                    if ((Arrays.equals(nameInBytes, directoryEntryFileName))) { // COMPARE USER INPUT AND FILENAME OF DIRECTORY ENTRY
-                        return logicalDisk.getIntOfBlockWithIndex(i, j);
+                for (int j = 0; j < 64; j = j + 8) {
+                    
+                    if (filename.equals(logicalDisk.disk.unpackString(directoryBlockPointers[i]*64+j))) {
+                        int fileIndex = logicalDisk.disk.unpack(directoryBlockPointers[i]*64+j+4);   
+                        return fileIndex;
                     }
                 }
             }
