@@ -19,4 +19,12 @@ public class FileDescriptor {
         logicalDisk.disk.pack(fileLength, index);
         // ALLOCATE BLOCK INDEX
     }
+
+    void deleteFileDescriptorAt(int index) {
+        System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);        
+        logicalDisk.disk.pack(0, index);
+        logicalDisk.disk.pack(0, index+4);
+        logicalDisk.disk.pack(0, index+8);
+        logicalDisk.disk.pack(0, index+12);        
+    }
 }

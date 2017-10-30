@@ -50,8 +50,6 @@ public class Directory {
                 } 
                 else {
                     int lengthOfFile = logicalDisk.getIntOfBlockWithIndex(i, j);
-                    System.out.printf("i: %d, j: %d", i, j);                    
-                    System.out.println(lengthOfFile);
                     if (lengthOfFile == 0) {
                         return i*64+j;
                     }
@@ -78,6 +76,20 @@ public class Directory {
         }
     }
 
+    public void trashFile(String filename) {
+        System.out.printf("==> int Directory.trashFile(String filename = %s);\n", filename);
+        try {
+            int fileDescriptorIndex = removeFileFromDirectory(filename);
+            if (fileDescriptorIndex != -1) {
+                removeFileDescriptorAt(fileDescriptorIndex);                
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            // return -1;
+        }
+    }
+
     int insertFileIntoDirectory(String filename, int index) {
         System.out.printf("==> int Directory.insertFileIntoDirectory(String filename = %s, int index = %d);\n", filename, index);        
         int[] directoryBlockNumbers = getDirectoryBlockNumbers();
@@ -94,10 +106,33 @@ public class Directory {
         return -1;
     }
 
+    int removeFileFromDirectory(String filename) {
+        System.out.printf("==> int Directory.removeFileFromDirectory(String filename = %s);\n", filename);        
+        int[] directoryBlockNumbers = getDirectoryBlockNumbers();
+        for (int i=0; i<directoryBlockNumbers.length; i++) {
+
+            for (int j=0; j<64; j=j+8) {
+                int fileDescriptorIndex = logicalDisk.disk.unpack(64*directoryBlockNumbers[i]+j+4);
+                if (filename.equals(logicalDisk.disk.unpackString(64*directoryBlockNumbers[i]+j))) {
+                    logicalDisk.disk.pack(0, 64*directoryBlockNumbers[i]+j);
+                    logicalDisk.disk.pack(0, 64*directoryBlockNumbers[i]+j+4);
+                    return fileDescriptorIndex;
+                }
+            }
+        }
+        return -1;
+    }
+
     void newFileDescriptorAt(int index) {
         System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
         FileDescriptor newFileDescriptor = new FileDescriptor(logicalDisk);
         newFileDescriptor.saveToFileDescriptorIndex(index);
+    }
+
+    void removeFileDescriptorAt(int index) {
+        System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
+        FileDescriptor fileDescriptorToDelete = new FileDescriptor(logicalDisk);
+        fileDescriptorToDelete.deleteFileDescriptorAt(index);
     }
 
     public int getBlockIndexOfFile(int index, int blockNum) {
@@ -106,9 +141,6 @@ public class Directory {
 
     public int getLengthOfFile(int index) {
         return 0;
-    }
-
-    public void trashFile(String filename) {
     }
 
     public void updateLengthOfFileDescriptor(int index) {

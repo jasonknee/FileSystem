@@ -12,17 +12,8 @@ public class FileSystem {
         directory = new Directory(logicalDisk);
         fileTable = new FileTable(logicalDisk);
         fileTable.alloc();
-        
-        logicalDisk.printDisk();                                    
     }
-
-    // • Find a free file descriptor (read in and scan ldisk [0] through ldisk [k − 1])
-    // • Find a free entry in the directory (this is done by rewinding the directory and
-    //   reading it until a free slot is found; recall that the directory is treated just like any
-    //   other file). At the same time, verify that the file does not already exists. If it does,
-    //   return error status.
-    // • Enter the symbolic file name and the descriptor index into the found directory entry
-    // • Return status
+    
     int create(String filename) {
         System.out.printf("=> void create(char[] filename = %s);\n", filename);
 
@@ -57,7 +48,7 @@ public class FileSystem {
         }
 
         directory.trashFile(filename);
-        bitMap.freeBlockIndex(fileDescriptorBlockIndex);
+        // bitMap.freeBlockIndex(fileDescriptorBlockIndex);
         return 0;
 
     }
