@@ -1,13 +1,15 @@
 public class FileTableEntry {
     public byte[] bufferData;
+    public String fileName;
     public int fileLength;
     public int positionInFile;
     public int fileDescriptorIndex;
     public int fileTableIndex;
     public boolean available;
 
-    public FileTableEntry(byte[] data, int length, int pos, int i, int ftI) {
+    public FileTableEntry(byte[] data, String name, int length, int pos, int i, int ftI) {
         bufferData = data;
+        fileName = name;
         fileLength = length;
         positionInFile = pos;
         fileDescriptorIndex = i;
@@ -15,8 +17,9 @@ public class FileTableEntry {
         available = false;
     }
 
-    public void init(byte[] data, int length, int pos, int i, int ftI) {
+    public void init(byte[] data, String name, int length, int pos, int i, int ftI) {
         bufferData = data;
+        fileName = name;
         fileLength = length;
         positionInFile = pos;
         fileDescriptorIndex = i;
@@ -26,6 +29,7 @@ public class FileTableEntry {
 
     public FileTableEntry(int index) {
         bufferData = null;
+        fileName = "";
         fileLength = -1;
         positionInFile = 0;
         fileDescriptorIndex = -1;
@@ -35,6 +39,10 @@ public class FileTableEntry {
 
     public boolean isAvailable() {
         return available;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public void moveToPosition(int position) {}

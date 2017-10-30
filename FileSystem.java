@@ -66,6 +66,11 @@ public class FileSystem {
             return -1; // NO OPEN FILE TABLES
         }
 
+        if (fileTable.isFileOpen(filename)) {
+            System.out.println("ERROR: file is already open");            
+            return -1; // FILE ALREADY OPEN IN FILE TABLE
+        }
+
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) {
             System.out.println("ERROR: file does not exist");                        
@@ -76,7 +81,7 @@ public class FileSystem {
         int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0); // GET BLOCK INDEX
         byte[] blockData = logicalDisk.readBlock(blockIndex);
 
-        int openFileTableIndex = fileTable.allocateEntry(blockData, fileLength, 0, fileDescriptorBlockIndex);
+        int openFileTableIndex = fileTable.allocateEntry(blockData, filename, fileLength, 0, fileDescriptorBlockIndex);
         if (openFileTableIndex != -1) {
             System.out.printf("%s opened %d\n", filename, openFileTableIndex);                        
             return openFileTableIndex;

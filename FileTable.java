@@ -31,9 +31,19 @@ public class FileTable {
         return -1;
     }
 
+
     public boolean isFree() {
         for (int i = 0; i < fileTable.length; i++) {
             if (fileTable[i].isAvailable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isFileOpen(String filename) {
+        for (int i=0; i<fileTable.length; i++) {
+            if (filename.equals(fileTable[i].getFileName())) {
                 return true;
             }
         }
@@ -58,11 +68,11 @@ public class FileTable {
         return logicalDisk.disk.unpack(index+4 * (4*fdBlockIndex));
     }
 
-    public int allocateEntry(byte[] data, int length, int position, int index) {
+    public int allocateEntry(byte[] data, String filename, int length, int position, int index) {
         System.out.printf("==> void FileTable.allocateEntry(int index = %d , int length = %d, int position = %d);\n", index, length, position);        
         int fileTableIndex = getAvailableFileTableIndex();
         if (fileTableIndex != -1) {
-            fileTable[fileTableIndex].init(data, length, position, index, fileTableIndex);
+            fileTable[fileTableIndex].init(data, filename, length, position, index, fileTableIndex);
             return fileTableIndex;
         }
         return -1;
@@ -73,7 +83,7 @@ public class FileTable {
     }
 
     public FileTableEntry writeToDisk(int index) {
-        return new FileTableEntry(null, -1, -1, -1, -1);
+        return new FileTableEntry(null, "", -1, -1, -1, -1);
     }
 
     public int findFileDescriptorIndexOfFile(int index) {
