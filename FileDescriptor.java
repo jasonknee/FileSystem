@@ -1,6 +1,6 @@
 public class FileDescriptor {
     LogicalDisk logicalDisk;
-    public byte[] blockPointers;
+    public int[] blockPointers;
     public int fileLength;
 
     // public FileDescriptor(byte[] arrayOfBlockPointers, int length) {
@@ -10,14 +10,21 @@ public class FileDescriptor {
 
     public FileDescriptor(LogicalDisk disk) {
         logicalDisk = disk;
-        blockPointers = new byte[3];
+        blockPointers = new int[3];
         fileLength = -1;
     }
 
     void saveToFileDescriptorIndex(int index) {
         System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);
         logicalDisk.disk.pack(fileLength, index);
+        initNewBlock(index);
         // ALLOCATE BLOCK INDEX
+    }
+
+    void initNewBlock(int index) {
+        int nextAvailableBlock = logicalDisk.getNextAvailableBlock();
+        logicalDisk.disk.pack(-1, nextAvailableBlock*64);
+        logicalDisk.disk.pack(nextAvailableBlock, index+4); // INIT FIRST BUFFER BLOCK        
     }
 
     void deleteFileDescriptorAt(int index) {

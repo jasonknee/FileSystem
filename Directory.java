@@ -135,8 +135,19 @@ public class Directory {
         fileDescriptorToDelete.deleteFileDescriptorAt(index);
     }
 
-    public int getBlockIndexOfFile(int index, int blockNum) {
-        return 0;
+    public int getBlockIndexOfFile(int index, int fdBlockIndex) {
+        System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);
+        int blockIndex = logicalDisk.disk.unpack(index+4 + (4*fdBlockIndex));
+        if (blockIndex != 0) {
+            return blockIndex;
+        }
+        int nextAvailableBlock = logicalDisk.getNextAvailableBlock();
+        if (nextAvailableBlock != -1) {
+            System.out.printf("NextAVailableBlock = %d", nextAvailableBlock);
+            logicalDisk.disk.pack(nextAvailableBlock, index+4 + (4*fdBlockIndex));     
+            return nextAvailableBlock;
+        }
+        return -1;
     }
 
     public int getLengthOfFile(int index) {

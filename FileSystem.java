@@ -10,7 +10,7 @@ public class FileSystem {
         logicalDisk = new LogicalDisk(BLOCK_SIZE);
         bitMap = new BitMap(logicalDisk);
         directory = new Directory(logicalDisk);
-        fileTable = new FileTable(logicalDisk);
+        fileTable = new FileTable(logicalDisk, directory);
         fileTable.alloc();
     }
     
@@ -81,12 +81,14 @@ public class FileSystem {
         int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0); // GET BLOCK INDEX
         byte[] blockData = logicalDisk.readBlock(blockIndex);
         int openFileTableIndex = fileTable.allocateEntry(blockData, filename, fileLength, 0, fileDescriptorBlockIndex);
+        
 
         if (openFileTableIndex == -1) {
             return -1;            
         }
 
-        System.out.printf("%s opened %d\n", filename, openFileTableIndex);                        
+        System.out.printf("%s opened %d\n", filename, openFileTableIndex);
+                        
         return openFileTableIndex;
     }
 
@@ -99,13 +101,11 @@ public class FileSystem {
 
         FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         fileTable.writeToDisk(fileTableIndex);
-
-        if (fileTableEntry == null) { return -1; }
+        fileTableEntry.dealloc(fileTableIndex);
 
         directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
         fileTable.freeEntry(fileTableEntry.fileTableIndex);
         return 0;
-
     }
 
 
@@ -119,14 +119,10 @@ public class FileSystem {
     //              • write the buffer into the appropriate block on disk (if modified),
     //              • read the next sequential block from the disk into the buffer;
     //              • continue with step 2.
-    byte[] read(int fileTableIndex, int count) {
+    int read(int fileTableIndex, int count) {
         System.out.printf("=> int read(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
-
-        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
-
-        if (fileTableEntry == null) { System.exit(0); }
-
-        byte[] bytesRead = fileTableEntry.readFile(count);
+        int bytesRead = fileTable.readFile(fileTableIndex, count);
+        System.out.printf("bytes read: %d", bytesRead);
         return bytesRead;
     }
 
@@ -142,13 +138,14 @@ public class FileSystem {
     //          • JUMP TO (LOOP)
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
-        System.out.printf("=> int write(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
-        
-        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
-        if (fileTableEntry == null) { return -1; }
+        System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);                
+        fileTable.writeCharsToFile(fileTableIndex, character, count);
+        logicalDisk.printDisk();
+        // FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
+        // if (fileTableEntry == null) { return -1; }
 
-        int bytesWritten = fileTableEntry.writeFile(character, count);
-        return bytesWritten;
+        // int bytesWritten = fileTableEntry.writeFile(character, count);
+        return 0;
     }
 
     int lseek(int fileTableIndex, int position) {

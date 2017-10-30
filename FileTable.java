@@ -1,15 +1,17 @@
 public class FileTable {
     FileTableEntry[] fileTable;
     LogicalDisk logicalDisk;
+    Directory directory;
 
-    public FileTable(LogicalDisk disk) {
+    public FileTable(LogicalDisk disk, Directory dir) {
         fileTable = new FileTableEntry[3];
         logicalDisk = disk;
+        directory = dir;
     }
 
     public void alloc() {
         for (int i = 0; i < fileTable.length; i++) {
-            fileTable[i] = new FileTableEntry(i);
+            fileTable[i] = new FileTableEntry(logicalDisk, directory, i);
         }
     }
 
@@ -65,31 +67,74 @@ public class FileTable {
 
     public int getBlockIndexOfFile(int index, int fdBlockIndex) {
         System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);        
-        return logicalDisk.disk.unpack(index+4 + (4*fdBlockIndex));
+        return logicalDisk.disk.unpack(index + 4 + (4*fdBlockIndex));
     }
 
     public int allocateEntry(byte[] data, String filename, int length, int position, int index) {
         System.out.printf("==> void FileTable.allocateEntry(int index = %d , int length = %d, int position = %d);\n", index, length, position);        
         int fileTableIndex = getAvailableFileTableIndex();
-        if (fileTableIndex != -1) {
-            fileTable[fileTableIndex].init(data, filename, length, position, index, fileTableIndex);
-            return fileTableIndex;
+        if (fileTableIndex == -1) {
+            return -1;
         }
-        return -1;
+                    
+        fileTable[fileTableIndex].init(data, filename, length, position, index, fileTableIndex);
+        return fileTableIndex;
     }
 
     public FileTableEntry getFileTableEntry(int index) {
         return fileTable[index];
     }
 
-    public int writeToDisk(int index) {
+    public void writeToDisk(int index) {
         FileTableEntry fileToDelete = getFileTableEntry(index);
-        int fdBlockIndex = fileTable[index].getBufferBlockNum();        
-        int blockIndex = getBlockIndexOfFile(fileToDelete.fileDescriptorIndex, fdBlockIndex);
-        logicalDisk.writeBlock(blockIndex, fileToDelete.bufferData);
-        fileToDelete.dealloc(index);
-        return 0;
+        int fdBlockIndex = fileTable[index].getBufferBlockNum();
+        fileToDelete.writeBlock(fdBlockIndex);
     }
+
+    public int readFile(int fileTableIndex, int count) {
+        System.out.printf("==> void FileTable.readFile(int index = %d, int count = %d);\n", fileTableIndex, count);                
+        FileTableEntry fileToRead = getFileTableEntry(fileTableIndex);
+        int bytesRead = 0;
+        byte[] feed = new byte[count];
+        while(fileToRead.canRead() && bytesRead != count) {
+            feed[bytesRead] = fileToRead.getCurrentByte();
+            fileToRead.incrementPosition();
+            bytesRead++;
+        }
+        return bytesRead;
+    }
+
+    public void writeCharsToFile(int fileTableIndex, char c, int count) {
+        System.out.printf("==> void FileTable.writeCharsToFile(int fileTableIndex = %d, char c = %c, int count = %d);\n", fileTableIndex, c, count);                
+        FileTableEntry fileToWrite = getFileTableEntry(fileTableIndex);        
+        int bytesWritten = 0;
+        while(fileToWrite.canWrite() && bytesWritten < count) {
+            if (fileToWrite.endOfBufferBlock()) {
+                fileToWrite.writeCurrentAndLoadNextBlock();
+            }
+
+            fileToWrite.write(c);
+            fileToWrite.incrementPosition();
+            bytesWritten++;
+        }
+
+        System.out.printf("Bytes Written: %d", bytesWritten);
+        System.out.printf("FileLength: %d", fileToWrite.fileLength);        
+        fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());        
+    }
+        // while (fileToRead.getPosition() < fileToRead.getFileLength()) {
+        //     bytesRead = bytesRead + fileToRead.printBuffer();
+        //     writeToDisk(index);
+
+        //     int nextBlockIndex = fileToRead.getNextBlockIndex(directory);
+        //     if (nextBlockIndex != -1) {
+        //         return 0;
+        //     }
+
+        //     byte[] nextBlock = logicalDisk.readBlock(nextBlockIndex);
+        //     fileToRead.loadBlock(nextBlock);
+        // }
+        // return bytesRead;
 
     public int findFileDescriptorIndexOfFile(int index) {
         return 0;

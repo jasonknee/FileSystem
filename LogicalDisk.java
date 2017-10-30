@@ -38,6 +38,16 @@ public class LogicalDisk {
         return disk.mem;
     }
 
+    int getNextAvailableBlock() {
+        for (int i=8; i<61; i++) {
+            byte[] block = readBlock(i);
+            if (Arrays.equals(block, new byte[64])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     byte[] fullDiskAsByteArray() {
         return disk.mem;
     }
