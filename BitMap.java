@@ -8,4 +8,5 @@ public class BitMap {
     }
 
     public void freeBlockIndex(int blockIndex) {}
+    public void allocateBlockIndex(int blockIndex) {}
 }
