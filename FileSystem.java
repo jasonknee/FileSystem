@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class FileSystem {
     private final int BLOCK_SIZE = 64;
 
@@ -158,11 +160,14 @@ public class FileSystem {
         return -1;
     }
 
-    String[] directory() {
+    void directory() {
         System.out.printf("=> String[] directory();\n");                
-        String[] arrayOfFileNames;
+        List<String> arrayOfFileNames;
         arrayOfFileNames = directory.arrayOfFileNames();
-        return arrayOfFileNames;
+        for (String fileName : arrayOfFileNames) {
+			System.out.printf("%s ", fileName);
+        } 
+        System.out.printf("\n");
     }
 
     String init(String filename) {
