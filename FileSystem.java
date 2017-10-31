@@ -43,7 +43,7 @@ public class FileSystem {
             if (fileDescriptorIndex != -1) { // IF WE GET A FREE FILE DESCRIPTOR BLOCK
 
                 if (directory.createNewFile(filename, fileDescriptorIndex) == 0) {
-                    System.out.printf("\n%s created\n", filename);
+                    System.out.printf("%s created\n", filename);
                     return 0;
                 }
             }
@@ -109,7 +109,7 @@ public class FileSystem {
             return -1;            
         }
 
-        System.out.printf("\n%s opened %d\n", filename, openFileTableIndex);
+        System.out.printf("%s opened %d\n", filename, openFileTableIndex+1);
                         
         return openFileTableIndex;
     }
@@ -127,7 +127,7 @@ public class FileSystem {
 
         directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
         fileTable.freeEntry(fileTableEntry.fileTableIndex);
-        System.out.printf("%d closed\n", fileTableIndex);
+        System.out.printf("%d closed\n", fileTableIndex + 1);
         return 0;
     }
 
@@ -187,7 +187,6 @@ public class FileSystem {
         // System.out.printf("=> String[] directory();\n");                
         List<String> arrayOfFileNames;
         arrayOfFileNames = directory.arrayOfFileNames();
-        System.out.printf("\n");        
         for (String fileName : arrayOfFileNames) {
 			System.out.printf("%s ", fileName);
         } 
@@ -207,7 +206,7 @@ public class FileSystem {
             System.out.println("disk restored");            
             return "disk restored";
         }
-        System.out.println("\ndisk initialized");
+        System.out.println("disk initialized");
         return "disk initialized";
     }
 
@@ -216,7 +215,7 @@ public class FileSystem {
         try {
             byte[] disk = logicalDisk.fullDiskAsByteArray();
             FileStream.write(filename, disk);
-            System.out.println("\ndisk saved");
+            System.out.println("disk saved\n");
             return "disk saved";
         }
         catch (Exception e) {
