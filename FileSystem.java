@@ -15,6 +15,21 @@ public class FileSystem {
         fileTable = new FileTable(logicalDisk, directory);
         fileTable.alloc();
     }
+
+    void dealloc() {
+        logicalDisk = null;
+        bitMap = null;
+        directory = null;
+        fileTable = null;
+    }
+
+    void alloc() {
+        logicalDisk = new LogicalDisk(BLOCK_SIZE);
+        bitMap = new BitMap(logicalDisk);
+        directory = new Directory(logicalDisk);
+        fileTable = new FileTable(logicalDisk, directory);
+        fileTable.alloc();
+    }
     
     int create(String filename) {
         System.out.printf("=> void create(char[] filename = %s);\n", filename);
@@ -172,14 +187,15 @@ public class FileSystem {
 
     String init(String filename) {
         System.out.printf("=> void int(String filename = %s);\n", filename);        
-        
+        dealloc();
+        alloc();
+
         if (FileStream.fileExists(filename)) {
             byte[] fileBlock = FileStream.getFileAsByteArray(filename);
             logicalDisk.init(fileBlock);
             return "disk restored";
         }
-
-        FileStream.createFile(filename);
+        System.out.println("disk initialized");
         return "disk initialized";
     }
 
