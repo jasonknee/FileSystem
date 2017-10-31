@@ -99,11 +99,16 @@ public class Exec {
             System.out.println("Enter file name: ");
         
             String fileName = scanner.nextLine();
+            File file = new File(fileName);
+            String absPath = file.getAbsolutePath();
+            String path = absPath.substring(0,absPath.lastIndexOf(File.separator));;
 
-            PrintStream psr = new PrintStream(new FileOutputStream("77653453.txt", false));
+            System.out.println(path);
+            PrintStream psr = new PrintStream(new FileOutputStream(path+"/77653453.txt", false));
             System.setOut(psr);
 
-            Files.lines(new File(fileName).toPath())
+        
+            Files.lines(file.toPath())
                 .map(d -> d.trim())
                 .forEach(d -> executeCommand(stringParser(d)));
         }
