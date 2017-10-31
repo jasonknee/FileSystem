@@ -50,11 +50,11 @@ op dog
 sk 1 128
 rd 1 32
 rd 1 32
-rd 1 5
-sk 1 192
-rd 1 1
-sk 1 191
-rd 1 1
+sk 1 1
+rd 1 10
+rd 1 25
+sk 1 185
+rd 1 20
 cl 1
 de dog
 de cat
