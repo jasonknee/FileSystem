@@ -7,7 +7,7 @@ public class FileStream {
     public FileStream() {}
 
     static byte[] getFileAsByteArray(String filename){
-        System.out.printf("=> byte[] FileStream.getFileAsByteArray(string filename = %s);\n", filename);
+        // System.out.printf("=> byte[] FileStream.getFileAsByteArray(string filename = %s);\n", filename);
         
         byte[] fileDisk = new byte[DISK_SIZE];
         

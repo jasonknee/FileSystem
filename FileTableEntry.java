@@ -89,7 +89,7 @@ public class FileTableEntry {
     }
 
     public int printBuffer() {
-        System.out.printf("=> FileTableEntry.printBuffer()\n");        
+        // System.out.printf("=> FileTableEntry.printBuffer()\n");        
         int dist = 0;
         for (int p = positionInFile%64; p < 64; p++,dist++) {
             byte[] feed = Arrays.copyOfRange(bufferData, p, 63);
@@ -132,12 +132,12 @@ public class FileTableEntry {
     }
 
     public boolean canWrite() {
-        System.out.printf("=> FileTableEntry.canWrite() = %s\n", positionInFile<192 ? "true" : "false");                
-        return positionInFile < 192;
+        // System.out.printf("=> FileTableEntry.canWrite() = %s\n", positionInFile<192 ? "true" : "false");                
+        return positionInFile <= 192;
     }
 
     public void write(char c) {
-        System.out.printf("=> FileTableEntry.write(char c = %c)\n", c);
+        // System.out.printf("=> FileTableEntry.write(char c = %c)\n", c);
         fileLength++;
         bufferData[(positionInFile)%64] = (byte) c;
     }
@@ -148,7 +148,7 @@ public class FileTableEntry {
     }
 
     public void writeCurrentAndLoadNextBlock() {
-        System.out.printf("=> FileTableEntry.writeCurrentAndLoadNextBlock()\n");
+        // System.out.printf("=> FileTableEntry.writeCurrentAndLoadNextBlock()\n");
         int bufferBlockNum = getBufferBlockNum();
         if (bufferBlockNum > 2) {
             return;
@@ -160,7 +160,7 @@ public class FileTableEntry {
     }
 
     public void writeCurrentAndLoadSpecifiedBlock(int blockNum) {
-        System.out.printf("=> FileTableEntry.writeCurrentAndLoadNextBlock()\n");
+        // System.out.printf("=> FileTableEntry.writeCurrentAndLoadNextBlock()\n");
         int bufferBlockNum = getBufferBlockNum();
         if (bufferBlockNum > 2 || blockNum < 0 || blockNum > 2) {
             return;
@@ -180,18 +180,14 @@ public class FileTableEntry {
     }
 
     public void writeBlock(int blockNum) {
-        System.out.printf("=> FileTableEntry.writeBlock(int blockNum = %d)\n", blockNum);
+        // System.out.printf("=> FileTableEntry.writeBlock(int blockNum = %d)\n", blockNum);
         int blockPointer = logicalDisk.disk.unpack(fileDescriptorIndex+4 + (4*blockNum));
-        System.out.printf("THE BLOCK POINTER = %d", blockPointer);
         logicalDisk.disk.pack(fileLength,fileDescriptorIndex);
         logicalDisk.writeBlock(blockPointer, bufferData);
     }
 
     public void loadBlock(int blockNum) {
-        System.out.printf("=> FileTableEntry.loadNextBlock(int blockNum = %d)\n", blockNum);       
-        // int blockPointer = logicalDisk.disk.unpack(fileDescriptorIndex+4 + (4*blockNum));
-        // byte[] nextBlock = logicalDisk.readBlock(blockPointer);
-        // loadBlock(nextBlock);
+        // System.out.printf("=> FileTableEntry.loadNextBlock(int blockNum = %d)\n", blockNum);
         if (0 <= blockNum && blockNum < 3) {            
             int x = directory.getBlockIndexOfFile(fileDescriptorIndex, blockNum);
             byte[] nextBlock = logicalDisk.readBlock(x);

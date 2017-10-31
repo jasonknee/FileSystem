@@ -16,7 +16,7 @@ public class FileTable {
     }
 
     public int insert(String filename, int index) {
-        System.out.printf("==> void FileTable.insert(String filename = %s, int index = %d);\n", filename, index);
+        // System.out.printf("==> void FileTable.insert(String filename = %s, int index = %d);\n", filename, index);
 
         int freeTableIndex = getFreeTableIndex();
         if (freeTableIndex != -1) {
@@ -66,12 +66,12 @@ public class FileTable {
     }
 
     public int getBlockIndexOfFile(int index, int fdBlockIndex) {
-        System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);        
+        // System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);        
         return logicalDisk.disk.unpack(index + 4 + (4*fdBlockIndex));
     }
 
     public int allocateEntry(byte[] data, String filename, int length, int position, int index) {
-        System.out.printf("==> void FileTable.allocateEntry(int index = %d , int length = %d, int position = %d);\n", index, length, position);        
+        // System.out.printf("==> void FileTable.allocateEntry(int index = %d , int length = %d, int position = %d);\n", index, length, position);        
         int fileTableIndex = getAvailableFileTableIndex();
         if (fileTableIndex == -1) {
             return -1;
@@ -92,7 +92,7 @@ public class FileTable {
     }
 
     public int readFile(int fileTableIndex, int count) {
-        System.out.printf("==> void FileTable.readFile(int index = %d, int count = %d);\n", fileTableIndex, count);                
+        // System.out.printf("==> void FileTable.readFile(int index = %d, int count = %d);\n", fileTableIndex, count);                
         FileTableEntry fileToRead = getFileTableEntry(fileTableIndex);
         int bytesRead = 0;
         char[] feed = new char[count];
@@ -113,7 +113,7 @@ public class FileTable {
     }
 
     public int  writeCharsToFile(int fileTableIndex, char c, int count) {
-        System.out.printf("==> void FileTable.writeCharsToFile(int fileTableIndex = %d, char c = %c, int count = %d);\n", fileTableIndex, c, count);                
+        // System.out.printf("==> void FileTable.writeCharsToFile(int fileTableIndex = %d, char c = %c, int count = %d);\n", fileTableIndex, c, count);                
         FileTableEntry fileToWrite = getFileTableEntry(fileTableIndex);        
         int bytesWritten = 0;
         while(fileToWrite.canWrite() && bytesWritten < count) {
@@ -125,9 +125,7 @@ public class FileTable {
             fileToWrite.incrementPosition();
             bytesWritten++;
         }
-
-        System.out.printf("Bytes Written: %d", bytesWritten);
-        System.out.printf("FileLength: %d", fileToWrite.fileLength);        
+      
         fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());  
         return bytesWritten;      
     }

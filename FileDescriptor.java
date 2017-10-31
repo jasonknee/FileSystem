@@ -15,7 +15,7 @@ public class FileDescriptor {
     }
 
     void saveToFileDescriptorIndex(int index) {
-        System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);
+        // System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);
         logicalDisk.disk.pack(fileLength, index);
         initNewBlock(index);
         // ALLOCATE BLOCK INDEX
@@ -28,7 +28,7 @@ public class FileDescriptor {
     }
 
     void deleteFileDescriptorAt(int index) {
-        System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);        
+        // System.out.printf("==> void FileDescriptor.saveToFileDescriptorIndex(int index = %d);\n", index);        
         logicalDisk.disk.pack(0, index);
         logicalDisk.disk.pack(0, index+4);
         logicalDisk.disk.pack(0, index+8);

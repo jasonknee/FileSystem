@@ -23,7 +23,7 @@ public class Directory {
     }
 
     public int findFileDescriptorIndexOfFile(String filename) {
-        System.out.printf("==> int Directory.findFileDescriptorIndexOfFile(String filename = %s);\n", filename);
+        // System.out.printf("==> int Directory.findFileDescriptorIndexOfFile(String filename = %s);\n", filename);
 
         byte[] nameInBytes = filename.getBytes();
         int[] directoryBlockPointers = getDirectoryBlockNumbers();
@@ -43,7 +43,7 @@ public class Directory {
     }
 
     public int getFreeFileDescriptorIndex() {
-        System.out.printf("==> int Directory.getFreeFileDescriptorIndex();\n");
+        // System.out.printf("==> int Directory.getFreeFileDescriptorIndex();\n");
         for (int i=1; i<8; i++) {
             for (int j=0; j<64; j=j+16) {
                 if (i == 1 && j == 0) {
@@ -61,7 +61,7 @@ public class Directory {
     }
 
     public int createNewFile(String filename, int index) {
-        System.out.printf("==> int Directory.createNewFile(String filename = %s, int index = %d);\n", filename, index);
+        // System.out.printf("==> int Directory.createNewFile(String filename = %s, int index = %d);\n", filename, index);
         
         try {
             if (insertFileIntoDirectory(filename, index) == -1) {
@@ -77,7 +77,7 @@ public class Directory {
     }
 
     public void trashFile(String filename) {
-        System.out.printf("==> int Directory.trashFile(String filename = %s);\n", filename);
+        // System.out.printf("==> int Directory.trashFile(String filename = %s);\n", filename);
         try {
             int fileDescriptorIndex = removeFileFromDirectory(filename);
             if (fileDescriptorIndex != -1) {
@@ -91,7 +91,7 @@ public class Directory {
     }
 
     int insertFileIntoDirectory(String filename, int index) {
-        System.out.printf("==> int Directory.insertFileIntoDirectory(String filename = %s, int index = %d);\n", filename, index);        
+        // System.out.printf("==> int Directory.insertFileIntoDirectory(String filename = %s, int index = %d);\n", filename, index);        
         int[] directoryBlockNumbers = getDirectoryBlockNumbers();
         for (int i=0; i<directoryBlockNumbers.length; i++) {
 
@@ -107,7 +107,7 @@ public class Directory {
     }
 
     int removeFileFromDirectory(String filename) {
-        System.out.printf("==> int Directory.removeFileFromDirectory(String filename = %s);\n", filename);        
+        // System.out.printf("==> int Directory.removeFileFromDirectory(String filename = %s);\n", filename);        
         int[] directoryBlockNumbers = getDirectoryBlockNumbers();
         for (int i=0; i<directoryBlockNumbers.length; i++) {
 
@@ -124,26 +124,25 @@ public class Directory {
     }
 
     void newFileDescriptorAt(int index) {
-        System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
+        // System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
         FileDescriptor newFileDescriptor = new FileDescriptor(logicalDisk);
         newFileDescriptor.saveToFileDescriptorIndex(index);
     }
 
     void removeFileDescriptorAt(int index) {
-        System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
+        // System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
         FileDescriptor fileDescriptorToDelete = new FileDescriptor(logicalDisk);
         fileDescriptorToDelete.deleteFileDescriptorAt(index);
     }
 
     public int getBlockIndexOfFile(int index, int fdBlockIndex) {
-        System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);
+        // System.out.printf("==> void FileTable.getBlockIndexOfFile(int index = %d, int fdBlockIndex = %d);\n", index, fdBlockIndex);
         int blockIndex = logicalDisk.disk.unpack(index+4 + (4*fdBlockIndex));
         if (blockIndex != 0) {
             return blockIndex;
         }
         int nextAvailableBlock = logicalDisk.getNextAvailableBlock();
         if (nextAvailableBlock != -1) {
-            System.out.printf("NextAVailableBlock = %d", nextAvailableBlock);
             logicalDisk.disk.pack(nextAvailableBlock, index+4 + (4*fdBlockIndex));     
             return nextAvailableBlock;
         }
