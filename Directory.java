@@ -90,6 +90,7 @@ public class Directory {
         try {
             int fileDescriptorIndex = removeFileFromDirectory(filename);
             if (fileDescriptorIndex != -1) {
+                deallocBlocksAtFileDescriptor(fileDescriptorIndex);
                 removeFileDescriptorAt(fileDescriptorIndex);
             }
         } catch (Exception e) {
@@ -119,6 +120,7 @@ public class Directory {
         int[] directoryBlockNumbers = getDirectoryBlockNumbers();
         for (int i = 0; i < directoryBlockNumbers.length; i++) {
 
+            // REMOVE FROM DIRECTORY
             for (int j = 0; j < 64; j = j + 8) {
                 int fileDescriptorIndex = logicalDisk.disk.unpack(64 * directoryBlockNumbers[i] + j + 4);
                 if (filename.equals(logicalDisk.disk.unpackString(64 * directoryBlockNumbers[i] + j))) {
@@ -141,6 +143,17 @@ public class Directory {
         // System.out.printf("==> int Directory.newFileDescriptorAt(int index = %d);\n", index);
         FileDescriptor fileDescriptorToDelete = new FileDescriptor(logicalDisk);
         fileDescriptorToDelete.deleteFileDescriptorAt(index);
+
+    }
+
+    void deallocBlocksAtFileDescriptor(int index) {
+        for (int i=0; i<3; i++) {
+            int bp = logicalDisk.disk.unpack(index+4+(i*4));
+            if (bp != 0) {
+                byte[] zeroBlock = new byte[64];
+                logicalDisk.writeBlock(bp, zeroBlock);
+            }
+        }
     }
 
     public int getBlockIndexOfFile(int index, int fdBlockIndex) {
@@ -158,7 +171,7 @@ public class Directory {
     }
 
     public int getLengthOfFile(int index) {
-        return 0;
+        return logicalDisk.disk.unpack(index);
     }
 
     public void updateLengthOfFileDescriptor(int index) {

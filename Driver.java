@@ -67,7 +67,7 @@ public class Driver
                     fs.directory();
             } else if (cmd.equals("in")) {
                     example_cmd = "in <disk_cont.txt>";  
-                    String filename = args[0];
+                    String filename = args.length > 0 ? args[0] : "";
                     
                     fs.init(filename);
             } else if (cmd.equals("sv")) {
@@ -101,9 +101,11 @@ public class Driver
         System.out.println("FS (by Jason)");
                 
         do {
-            System.out.println("Enter Your Command: \n");
+            System.out.println("\nEnter Your Command: \n");
 
             inputs = stringParser(scanner.nextLine());
+            System.out.printf("\n");
+            
             executeCommand(inputs);
 
             // break;

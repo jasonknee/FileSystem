@@ -32,22 +32,24 @@ public class FileSystem {
     }
     
     int create(String filename) {
-        System.out.printf("=> void create(char[] filename = %s);\n", filename);
+        // System.out.printf("=> void create(char[] filename = %s);\n", filename);
 
         int fileDescriptorIndex = directory.findFileDescriptorIndexOfFile(filename);
-        System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
+        // System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
         if (fileDescriptorIndex == -1) { // IF WE DON'T FIND A FILE
 
             fileDescriptorIndex = directory.getFreeFileDescriptorIndex();
-            System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
+            // System.out.printf("===== OUTPUT: fileDescriptorIndex = %d\n", fileDescriptorIndex);        
             if (fileDescriptorIndex != -1) { // IF WE GET A FREE FILE DESCRIPTOR BLOCK
 
                 if (directory.createNewFile(filename, fileDescriptorIndex) == 0) {
+                    System.out.printf("\n%s created\n", filename);
                     return 0;
                 }
             }
         }
 
+        System.out.println("error");
         return -1;
     }
 
@@ -57,10 +59,11 @@ public class FileSystem {
     // • Free the file descriptor
     // • Return status
     int destroy(String filename) {
-        System.out.printf("=> void destroy(char[] filename = %s);\n", filename);
+        // System.out.printf("=> void destroy(char[] filename = %s);\n", filename);
 
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) {
+            System.out.println("error");            
             return -1;
         }
 
@@ -76,35 +79,37 @@ public class FileSystem {
     // • Read the first block of the file into the buffer (read-ahead)
     // • Return the OFT index (or error status)
     int open(String filename) {
-        System.out.printf("=> void open(char[] filename = %s);\n", filename);
+        // System.out.printf("=> void open(char[] filename = %s);\n", filename);
 
         if (!fileTable.isFree()) {
-            System.out.println("ERROR: no more entries available in oft");            
+            System.out.println("error");            
             return -1; // NO OPEN FILE TABLES
         }
 
         if (fileTable.isFileOpen(filename)) {
-            System.out.println("ERROR: file is already open");            
+            System.out.println("error");            
             return -1; // FILE ALREADY OPEN IN FILE TABLE
         }
 
         int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
         if (fileDescriptorBlockIndex == -1) {
-            System.out.println("ERROR: file does not exist");                        
+            System.out.println("error");                        
             return -1; // DID NOT FIND FILE
         }
 
         int fileLength = directory.getLengthOfFile(fileDescriptorBlockIndex);
         int blockIndex = directory.getBlockIndexOfFile(fileDescriptorBlockIndex, 0); // GET BLOCK INDEX
         byte[] blockData = logicalDisk.readBlock(blockIndex);
+        // System.out.printf("File Length %d\n", fileLength);
         int openFileTableIndex = fileTable.allocateEntry(blockData, filename, fileLength, 0, fileDescriptorBlockIndex);
         
 
         if (openFileTableIndex == -1) {
+            System.out.println("error");            
             return -1;            
         }
 
-        System.out.printf("%s opened %d\n", filename, openFileTableIndex);
+        System.out.printf("\n%s opened %d\n", filename, openFileTableIndex);
                         
         return openFileTableIndex;
     }
@@ -114,7 +119,7 @@ public class FileSystem {
     // • Free the OFT entry
     // • Return status
     int close(int fileTableIndex) {
-        System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);        
+        // System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);        
 
         FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
         fileTable.writeToDisk(fileTableIndex);
@@ -122,6 +127,7 @@ public class FileSystem {
 
         directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
         fileTable.freeEntry(fileTableEntry.fileTableIndex);
+        System.out.printf("%d closed\n", fileTableIndex);
         return 0;
     }
 
@@ -137,9 +143,11 @@ public class FileSystem {
     //              • read the next sequential block from the disk into the buffer;
     //              • continue with step 2.
     int read(int fileTableIndex, int count) {
-        System.out.printf("=> int read(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
+        // logicalDisk.printDisk();
+        // System.out.printf("\n\n");
+        // System.out.printf("=> int read(int fileTableIndex = %s, int count, %d);\n", fileTableIndex, count);                
         int bytesRead = fileTable.readFile(fileTableIndex, count);
-        System.out.printf("bytes read: %d", bytesRead);
+        // System.out.printf("bytes read: %d", bytesRead);
         return bytesRead;
     }
 
@@ -155,20 +163,20 @@ public class FileSystem {
     //          • JUMP TO (LOOP)
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
-        System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);                
+        // System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);                
         int bytesWritten = fileTable.writeCharsToFile(fileTableIndex, character, count);
-        System.out.printf("%d bytes written", bytesWritten);        
-        logicalDisk.printDisk();
+        System.out.printf("%d bytes written\n", bytesWritten);        
+        // logicalDisk.printDisk();
         return 0;
     }
 
     int lseek(int fileTableIndex, int position) {
-        System.out.printf("=> int lseek(int fileTableIndex = %s, int position, %d);\n", fileTableIndex, position);                
+        // System.out.printf("=> int lseek(int fileTableIndex = %s, int position, %d);\n", fileTableIndex, position);                
         
         boolean success = fileTable.moveToPosition(fileTableIndex, position);
 
         if (success) {
-            System.out.printf("position is %d);\n", position);                            
+            System.out.printf("position is %d\n", position);                            
             return position;
         }
         System.out.printf("error\n");                                    
@@ -176,9 +184,10 @@ public class FileSystem {
     }
 
     void directory() {
-        System.out.printf("=> String[] directory();\n");                
+        // System.out.printf("=> String[] directory();\n");                
         List<String> arrayOfFileNames;
         arrayOfFileNames = directory.arrayOfFileNames();
+        System.out.printf("\n");        
         for (String fileName : arrayOfFileNames) {
 			System.out.printf("%s ", fileName);
         } 
@@ -186,24 +195,28 @@ public class FileSystem {
     }
 
     String init(String filename) {
-        System.out.printf("=> void int(String filename = %s);\n", filename);        
+        // System.out.printf("=> void int(String filename = %s);\n", filename);      
         dealloc();
         alloc();
 
         if (FileStream.fileExists(filename)) {
             byte[] fileBlock = FileStream.getFileAsByteArray(filename);
             logicalDisk.init(fileBlock);
+            // logicalDisk.printDisk();
+            // System.out.printf("\n\n");
+            System.out.println("disk restored");            
             return "disk restored";
         }
-        System.out.println("disk initialized");
+        System.out.println("\ndisk initialized");
         return "disk initialized";
     }
 
     String save(String filename) {
-        System.out.printf("=> void save(String filename = %s);\n", filename);        
+        // System.out.printf("=> void save(String filename = %s);\n", filename);        
         try {
             byte[] disk = logicalDisk.fullDiskAsByteArray();
             FileStream.write(filename, disk);
+            System.out.println("\ndisk saved");
             return "disk saved";
         }
         catch (Exception e) {
