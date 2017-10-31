@@ -61,16 +61,19 @@ public class FileSystem {
     int destroy(String filename) {
         // System.out.printf("=> void destroy(char[] filename = %s);\n", filename);
 
-        int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
-        if (fileDescriptorBlockIndex == -1) {
-            System.out.println("error");            
-            return -1;
+        try {
+            int fileDescriptorBlockIndex = directory.findFileDescriptorIndexOfFile(filename);
+            if (fileDescriptorBlockIndex == -1) {
+                System.out.println("error");            
+                return -1;
+            }
+    
+            directory.trashFile(filename);
         }
-
-        directory.trashFile(filename);
-        // bitMap.freeBlockIndex(fileDescriptorBlockIndex);
-        return 0;
-
+        catch (Exception e) {
+            System.out.println("error");
+        }
+        return 0;        
     }
 
     // • Search the directory to find the index of the file descriptor
@@ -121,13 +124,19 @@ public class FileSystem {
     int close(int fileTableIndex) {
         // System.out.printf("=> int close(int fileTableIndex = %s);\n", fileTableIndex);        
 
-        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
-        fileTable.writeToDisk(fileTableIndex);
-        fileTableEntry.dealloc(fileTableIndex);
-
-        directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
-        fileTable.freeEntry(fileTableEntry.fileTableIndex);
-        System.out.printf("%d closed\n", fileTableIndex + 1);
+        try {
+            FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
+            fileTable.writeToDisk(fileTableIndex);
+            fileTableEntry.dealloc(fileTableIndex);
+    
+            directory.updateLengthOfFileDescriptor(fileTableEntry.fileDescriptorIndex);
+            fileTable.freeEntry(fileTableEntry.fileTableIndex);
+            System.out.printf("%d closed\n", fileTableIndex + 1);
+        }
+        catch (Exception e) {
+            System.out.println("error");
+        }
+        
         return 0;
     }
 
@@ -163,10 +172,16 @@ public class FileSystem {
     //          • JUMP TO (LOOP)
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
-        // System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);                
-        int bytesWritten = fileTable.writeCharsToFile(fileTableIndex, character, count);
-        System.out.printf("%d bytes written\n", bytesWritten);        
-        // logicalDisk.printDisk();
+        // System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);
+        try { 
+            int bytesWritten = fileTable.writeCharsToFile(fileTableIndex, character, count);
+            System.out.printf("%d bytes written\n", bytesWritten);        
+            // logicalDisk.printDisk();
+        }             
+        catch (Exception e) {
+            System.out.println("error");
+        }
+
         return 0;
     }
 
@@ -184,13 +199,19 @@ public class FileSystem {
     }
 
     void directory() {
-        // System.out.printf("=> String[] directory();\n");                
-        List<String> arrayOfFileNames;
-        arrayOfFileNames = directory.arrayOfFileNames();
-        for (String fileName : arrayOfFileNames) {
-			System.out.printf("%s ", fileName);
-        } 
-        System.out.printf("\n");
+        // System.out.printf("=> String[] directory();\n");    
+        try {
+            List<String> arrayOfFileNames;
+            arrayOfFileNames = directory.arrayOfFileNames();
+            for (String fileName : arrayOfFileNames) {
+                System.out.printf("%s ", fileName);
+            } 
+            System.out.printf("\n");
+        }            
+        catch (Exception e) {
+            System.out.println("error");
+        }
+       
     }
 
     String init(String filename) {

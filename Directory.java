@@ -94,7 +94,7 @@ public class Directory {
                 removeFileDescriptorAt(fileDescriptorIndex);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("error");
             // return -1;
         }
     }

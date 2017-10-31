@@ -100,7 +100,7 @@ public class Exec {
         
             String fileName = scanner.nextLine();
 
-            PrintStream psr = new PrintStream(new FileOutputStream("output.txt", false));
+            PrintStream psr = new PrintStream(new FileOutputStream("77653453.txt", false));
             System.setOut(psr);
 
             Files.lines(new File(fileName).toPath())
