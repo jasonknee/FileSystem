@@ -96,7 +96,7 @@ public class FileTable {
         FileTableEntry fileToRead = getFileTableEntry(fileTableIndex);
         int bytesRead = 0;
         char[] feed = new char[count];
-        while(fileToRead.canRead() && bytesRead != count) {
+        while(fileToRead.canRead() && bytesRead < count) {
             if (fileToRead.endOfBufferBlock()) {
                 fileToRead.writeCurrentAndLoadNextBlock();
             }
