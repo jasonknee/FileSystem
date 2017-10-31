@@ -76,6 +76,8 @@ public class Exec {
                 String filename = args[0];
 
                 fs.save(filename);
+            } else if (cmd.equals("")) {
+                System.out.println("");
             } else {
                 System.out.println("/*************************************/\n" + "       ERROR: NO COMMAND ENTERED \n"
                         + "       EXAMPLE CMD: init\n" + "/*************************************/\n");
@@ -103,7 +105,6 @@ public class Exec {
 
             Files.lines(new File(fileName).toPath())
                 .map(d -> d.trim())
-                .filter(d -> !d.isEmpty())
                 .forEach(d -> executeCommand(stringParser(d)));
         }
 

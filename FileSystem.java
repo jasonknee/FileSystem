@@ -215,10 +215,11 @@ public class FileSystem {
         try {
             byte[] disk = logicalDisk.fullDiskAsByteArray();
             FileStream.write(filename, disk);
-            System.out.println("disk saved\n");
+            System.out.println("disk saved");
             return "disk saved";
         }
         catch (Exception e) {
+            System.out.println("error");
             return "error";
         }
     }
