@@ -139,23 +139,23 @@ public class FileSystem {
     //  • update file length in descriptor
     int write(int fileTableIndex, char character, int count) {
         System.out.printf("=> int write(int fileTableIndex = %d, char c = %s, int count = %d);\n", fileTableIndex, character, count);                
-        fileTable.writeCharsToFile(fileTableIndex, character, count);
+        int bytesWritten = fileTable.writeCharsToFile(fileTableIndex, character, count);
+        System.out.printf("%d bytes written", bytesWritten);        
         logicalDisk.printDisk();
-        // FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
-        // if (fileTableEntry == null) { return -1; }
-
-        // int bytesWritten = fileTableEntry.writeFile(character, count);
         return 0;
     }
 
     int lseek(int fileTableIndex, int position) {
         System.out.printf("=> int lseek(int fileTableIndex = %s, int position, %d);\n", fileTableIndex, position);                
         
-        FileTableEntry fileTableEntry = fileTable.getFileTableEntry(fileTableIndex);
-        if (fileTableEntry == null) { return -1; }
+        boolean success = fileTable.moveToPosition(fileTableIndex, position);
 
-        fileTableEntry.moveToPosition(position);
-        return 0;
+        if (success) {
+            System.out.printf("position is %d);\n", position);                            
+            return position;
+        }
+        System.out.printf("error\n");                                    
+        return -1;
     }
 
     String[] directory() {

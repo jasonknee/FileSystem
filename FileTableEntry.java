@@ -118,7 +118,7 @@ public class FileTableEntry {
     }
 
     public byte getCurrentByte() {
-        return bufferData[positionInFile+1%64];
+        return bufferData[positionInFile%64];
     }
 
     public boolean canRead() {
@@ -137,7 +137,7 @@ public class FileTableEntry {
     }
 
     public boolean endOfBufferBlock() {
-        System.out.printf("=> FileTableEntry.endOfBufferBlock() = %s, position: %d\n", positionInFile+1%64 == 0 ? "true" : "false", positionInFile);                                        
+        // System.out.printf("=> FileTableEntry.endOfBufferBlock() = %s, position: %d\n", positionInFile+1%64 == 0 ? "true" : "false", positionInFile);                                        
         return (positionInFile)%64 == 0 && positionInFile != 0;
     }
 
@@ -150,12 +150,21 @@ public class FileTableEntry {
         }                                               
     }
 
-    public void incrementPosition() {
-        System.out.printf("=> FileTableEntry.incrementPosition()\n");                                
+    public void writeCurrentAndLoadSpecifiedBlock(int blockNum) {
+        System.out.printf("=> FileTableEntry.writeCurrentAndLoadNextBlock()\n");
+        int bufferBlockNum = getBufferBlockNum();
+        if (bufferBlockNum > 0) {
+            writeBlock(bufferBlockNum);
+            loadBlock(blockNum);
+        }                                               
+    }
+
+    public int incrementPosition() {
+        // System.out.printf("=> FileTableEntry.incrementPosition()\n");                                
         if (positionInFile == fileLength-1) {
-            return;
+            return -1;
         }
-        positionInFile++;
+        return positionInFile++;
     }
 
     public void writeBlock(int blockNum) {
@@ -177,6 +186,31 @@ public class FileTableEntry {
             byte[] nextBlock = logicalDisk.readBlock(x);
             loadBlock(nextBlock);
         }
+    }
+
+    public boolean canMoveTo(int newPos) {
+        return 0 <= newPos && newPos < fileLength;
+    }
+
+    public void moveTo(int newPos) {
+        int newBlockNum;
+
+        if (0 < newPos && newPos < 64) {
+            newBlockNum = 0;
+        }
+        else if (64 < newPos && newPos < 128) {
+            newBlockNum = 1;            
+        }
+        else if (128 < newPos && newPos < 192) {
+            newBlockNum = 2;            
+        } else {
+            return;
+        }
+
+        if (newBlockNum != getBufferBlockNum()) {
+            writeCurrentAndLoadSpecifiedBlock(newBlockNum);
+        }
+        positionInFile = newPos;
     }
 
     public byte[] readFile(int count) { return new byte[64]; };   

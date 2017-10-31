@@ -95,16 +95,24 @@ public class FileTable {
         System.out.printf("==> void FileTable.readFile(int index = %d, int count = %d);\n", fileTableIndex, count);                
         FileTableEntry fileToRead = getFileTableEntry(fileTableIndex);
         int bytesRead = 0;
-        byte[] feed = new byte[count];
+        char[] feed = new char[count];
         while(fileToRead.canRead() && bytesRead != count) {
-            feed[bytesRead] = fileToRead.getCurrentByte();
-            fileToRead.incrementPosition();
-            bytesRead++;
+            if (fileToRead.endOfBufferBlock()) {
+                fileToRead.writeCurrentAndLoadNextBlock();
+            }
+            
+            feed[bytesRead] = (char)fileToRead.getCurrentByte();
+            System.out.printf("%c",feed[bytesRead]);            
+            bytesRead++;            
+            if(-1 == fileToRead.incrementPosition()) {
+                break;
+            }
         }
+        System.out.printf("\n");
         return bytesRead;
     }
 
-    public void writeCharsToFile(int fileTableIndex, char c, int count) {
+    public int  writeCharsToFile(int fileTableIndex, char c, int count) {
         System.out.printf("==> void FileTable.writeCharsToFile(int fileTableIndex = %d, char c = %c, int count = %d);\n", fileTableIndex, c, count);                
         FileTableEntry fileToWrite = getFileTableEntry(fileTableIndex);        
         int bytesWritten = 0;
@@ -120,7 +128,8 @@ public class FileTable {
 
         System.out.printf("Bytes Written: %d", bytesWritten);
         System.out.printf("FileLength: %d", fileToWrite.fileLength);        
-        fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());        
+        fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());  
+        return bytesWritten;      
     }
         // while (fileToRead.getPosition() < fileToRead.getFileLength()) {
         //     bytesRead = bytesRead + fileToRead.printBuffer();
@@ -136,6 +145,14 @@ public class FileTable {
         // }
         // return bytesRead;
 
+    public boolean moveToPosition(int fileTableIndex, int position) {
+        FileTableEntry file = getFileTableEntry(fileTableIndex);    
+        if (file.canMoveTo(position)) {
+            file.moveTo(position);
+            return true;
+        }    
+        return false;
+    }
     public int findFileDescriptorIndexOfFile(int index) {
         return 0;
     }
