@@ -67,7 +67,7 @@ public class FileSystem {
                 System.out.println("error");            
                 return -1;
             }
-    
+            System.out.printf("%s is destroyed\n", filename);
             directory.trashFile(filename);
         }
         catch (Exception e) {

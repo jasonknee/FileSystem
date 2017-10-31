@@ -126,7 +126,7 @@ public class FileTable {
             bytesWritten++;
         }
       
-        fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());  
+        // fileToWrite.writeBlock(fileToWrite.getBufferBlockNum());  
         return bytesWritten;      
     }
         // while (fileToRead.getPosition() < fileToRead.getFileLength()) {

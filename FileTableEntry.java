@@ -133,7 +133,7 @@ public class FileTableEntry {
 
     public boolean canWrite() {
         // System.out.printf("=> FileTableEntry.canWrite() = %s\n", positionInFile<192 ? "true" : "false");                
-        return positionInFile <= 192;
+        return positionInFile < 192;
     }
 
     public void write(char c) {
@@ -202,7 +202,7 @@ public class FileTableEntry {
     public void moveTo(int newPos) {
         int newBlockNum;
 
-        if (0 < newPos && newPos < 64) {
+        if (0 <= newPos && newPos < 64) {
             newBlockNum = 0;
         }
         else if (64 < newPos && newPos < 128) {
